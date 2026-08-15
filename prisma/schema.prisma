@@ -1,12 +1,21 @@
 // Esquema de base de datos por consultorio (Documento 03 §3: una base de
 // datos Postgres separada por consultorio, mismo esquema para todas).
 //
-// Fase 0 — Fundaciones (Documento 03 §5): solo se modelan Usuario (roles y
-// acceso) y BitacoraAuditoria (transversal desde el inicio, RF-080/081).
-// Paciente, Cita, Turno, Consulta, ListaEspera, CatalogoMedicamento y
-// ConversacionWhatsApp llegan en las fases donde el SRS los introduce
-// (Documento 04 §6) — no se adelantan aquí para no fijar un modelo de datos
-// que todavía puede cambiar antes de esas fases.
+// Fase 0 — Fundaciones: Usuario (roles y acceso) y BitacoraAuditoria
+// (transversal desde el inicio, RF-080/081).
+//
+// Fase 1 — Núcleo: Pacientes y Agenda (Documento 03 §5): Paciente,
+// TipoConsulta (catálogo, RF-028), HorarioMedico (RF-029b) y Cita
+// (RF-029a, crear/reprogramar/cancelar). El SRS (Documento 04) remite el
+// detalle de estos módulos a los RF-010..015 y RF-020..027 "sin cambios
+// respecto a v0.1" — ese archivo v0.1 no está en docs/, así que estos
+// modelos se diseñaron con lo explícito en Documento 03/04 (flujo del
+// consultorio §2, RF-028/029/029a/029b, diccionario de datos §6) más
+// criterio estándar de agenda clínica donde faltó detalle. Revisar contra
+// el v0.1 original si aparece.
+//
+// Turno, Consulta (nota clínica), ListaEspera, CatalogoMedicamento y
+// ConversacionWhatsApp llegan en las fases donde el SRS los introduce.
 
 generator client {
   provider = "prisma-client-js"
@@ -40,7 +49,10 @@ model Usuario {
   creadoEn      DateTime @default(now())
   actualizadoEn DateTime @updatedAt
 
-  bitacora BitacoraAuditoria[]
+  bitacora        BitacoraAuditoria[]
+  horarios        HorarioMedico[]
+  citasComoMedico Cita[]              @relation("CitasMedico")
+  citasCreadas    Cita[]              @relation("CitasCreadas")
 
   @@map("usuarios")
 }
@@ -59,4 +71,89 @@ model BitacoraAuditoria {
   @@index([usuarioId])
   @@index([fechaHora])
   @@map("bitacora_auditoria")
+}
+
+// Datos administrativos del paciente (Documento 04 §5: visibles para
+// Médico/Recepción/Admin). El historial clínico (diagnóstico, notas,
+// tratamiento) NO vive aquí — llega en Fase 4 como parte de la entidad
+// Consulta, con permisos distintos (solo médicos).
+model Paciente {
+  id              String    @id @default(cuid())
+  nombre          String
+  apellidos       String
+  telefono        String
+  fechaNacimiento DateTime?
+  notas           String?
+  activo          Boolean   @default(true)
+  creadoEn        DateTime  @default(now())
+  actualizadoEn   DateTime  @updatedAt
+
+  citas Cita[]
+
+  @@index([nombre, apellidos])
+  @@map("pacientes")
+}
+
+// Catálogo de tipos de servicio agendable (RF-028, diccionario §6.3a).
+// "Aplicación" (requiereAgenda = false) no se agenda — se atiende por orden
+// de llegada (RF-039, regla de los 30 minutos en Fase 2) — se deja en el
+// catálogo desde ahora porque es parte del mismo diccionario de datos,
+// aunque su flujo de turnos todavía no está implementado.
+model TipoConsulta {
+  id             String  @id @default(cuid())
+  nombre         String
+  duracionMin    Int
+  requiereAgenda Boolean @default(true)
+
+  citas Cita[]
+
+  @@map("tipos_consulta")
+}
+
+// RF-029b: horario laboral del médico, con patrones distintos por grupo de
+// días (ej. Lun/Mié/Vie 11:00-14:00 y 17:00-20:40; Mar/Jue/Sáb 11:00-14:00
+// y 17:00-19:00) — cada franja es una fila.
+model HorarioMedico {
+  id         String  @id @default(cuid())
+  medicoId   String
+  medico     Usuario @relation(fields: [medicoId], references: [id])
+  diaSemana  Int // 0 = domingo … 6 = sábado
+  horaInicio String // "HH:MM", 24h
+  horaFin    String // "HH:MM", 24h
+
+  @@index([medicoId])
+  @@map("horarios_medico")
+}
+
+enum EstadoCita {
+  AGENDADA
+  CONFIRMADA
+  REPROGRAMADA
+  CANCELADA
+  COMPLETADA
+  NO_ASISTIO
+}
+
+// RF-029a: la agenda se consulta de forma nativa en AGENDAM. RF-028: crear,
+// reprogramar, cancelar citas; estados de cita.
+model Cita {
+  id              String       @id @default(cuid())
+  pacienteId      String
+  paciente        Paciente     @relation(fields: [pacienteId], references: [id])
+  medicoId        String
+  medico          Usuario      @relation("CitasMedico", fields: [medicoId], references: [id])
+  tipoConsultaId  String
+  tipoConsulta    TipoConsulta @relation(fields: [tipoConsultaId], references: [id])
+  fechaHoraInicio DateTime
+  fechaHoraFin    DateTime
+  estado          EstadoCita   @default(AGENDADA)
+  notas           String?
+  creadoPorId     String?
+  creadoPor       Usuario?     @relation("CitasCreadas", fields: [creadoPorId], references: [id])
+  creadoEn        DateTime     @default(now())
+  actualizadoEn   DateTime     @updatedAt
+
+  @@index([medicoId, fechaHoraInicio])
+  @@index([pacienteId])
+  @@map("citas")
 }

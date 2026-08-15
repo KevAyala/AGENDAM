@@ -14,6 +14,7 @@ export async function iniciarSesion(formData: FormData) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error || !data.user) {
+    console.error("[login] Supabase auth error:", error?.status, error?.code, error?.message);
     redirect("/login?error=credenciales");
   }
 
