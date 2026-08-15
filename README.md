@@ -28,9 +28,10 @@ están implementadas — ver Documento 03 para el roadmap completo.
 1. Crea un proyecto en [Supabase](https://supabase.com) para tu consultorio
    (Postgres + Auth).
 2. Copia `.env.example` a `.env.local` (para Next.js) y a `.env` (para el
-   CLI de Prisma), y llena `DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`,
-   `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` con los
-   valores reales de ese proyecto.
+   CLI de Prisma), y llena `DATABASE_URL`, `DIRECT_URL`,
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y
+   `SUPABASE_SERVICE_ROLE_KEY` con los valores reales de ese proyecto
+   (Project Settings → Database / API en Supabase).
 3. Instala dependencias y aplica el esquema:
    ```
    npm install

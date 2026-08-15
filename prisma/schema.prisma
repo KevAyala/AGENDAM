@@ -14,7 +14,11 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // Conexión agrupada (pgbouncer, puerto 6543) — la usa la app en runtime.
+  url       = env("DATABASE_URL")
+  // Conexión directa (puerto 5432) — Prisma la necesita para migraciones;
+  // `prisma migrate` no funciona de forma confiable a través de pgbouncer.
+  directUrl = env("DIRECT_URL")
 }
 
 // Roles definidos en Documento 04 §5 (tabla de permisos).
