@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { PageHeader, btnPrimary, input, label as labelClass } from "@/components/ui";
+import { BuscadorPaciente } from "@/components/PacienteBuscador";
 import { crearCita } from "../actions";
 
 const ERRORES: Record<string, string> = {
@@ -41,57 +42,15 @@ export default async function NuevaCitaPage({
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="mb-6 text-lg font-semibold text-[var(--color-brand-azul-funcional)]">Nueva cita</h1>
-
-      {/* Paso 1: elegir paciente (si no viene preseleccionado desde su ficha) */}
-      {!pacienteSeleccionado ? (
-        <div className="mb-6">
-          <form className="flex gap-2">
-            <input
-              type="text"
-              name="pacienteQ"
-              defaultValue={params.pacienteQ}
-              placeholder="Buscar paciente por nombre o teléfono…"
-              className="w-full rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
-            />
-            <button type="submit" className="rounded-md border border-[var(--color-border)] px-4 py-2 text-sm">
-              Buscar
-            </button>
-          </form>
-          {resultadosBusqueda.length > 0 && (
-            <ul className="mt-3 divide-y divide-[var(--color-border)] rounded-lg border border-[var(--color-border)]">
-              {resultadosBusqueda.map((p) => (
-                <li key={p.id}>
-                  <Link
-                    href={`/agenda/nueva?pacienteId=${p.id}`}
-                    className="block px-3 py-2 text-sm hover:bg-black/[0.02]"
-                  >
-                    {p.apellidos}, {p.nombre} — {p.telefono}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-          {params.pacienteQ && resultadosBusqueda.length === 0 && (
-            <p className="mt-3 text-sm text-black/40">
-              Sin resultados.{" "}
-              <Link href="/pacientes/nuevo" className="text-[var(--color-brand-azul-funcional)] hover:underline">
-                Registrar paciente nuevo
-              </Link>
-              .
-            </p>
-          )}
-        </div>
-      ) : (
-        <div className="mb-6 flex items-center justify-between rounded-md bg-black/[0.03] px-3 py-2 text-sm">
-          <span>
-            Paciente: <strong>{pacienteSeleccionado.apellidos}, {pacienteSeleccionado.nombre}</strong>
-          </span>
-          <Link href="/agenda/nueva" className="text-xs text-[var(--color-brand-azul-funcional)] hover:underline">
-            Cambiar
-          </Link>
-        </div>
-      )}
+      <PageHeader kicker="Agenda" title="Nueva cita" />
+      <div className="mt-6">
+        <BuscadorPaciente
+          basePath="/agenda/nueva"
+          pacienteSeleccionado={pacienteSeleccionado}
+          query={params.pacienteQ}
+          resultados={resultadosBusqueda}
+        />
+      </div>
 
       {/* Paso 2: datos de la cita — solo con paciente ya elegido */}
       {pacienteSeleccionado && (
@@ -99,7 +58,7 @@ export default async function NuevaCitaPage({
           <input type="hidden" name="pacienteId" value={pacienteSeleccionado.id} />
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="medicoId" className="text-sm font-medium text-[#1a1a1a]">
+            <label htmlFor="medicoId" className={labelClass}>
               Médico
             </label>
             <select
@@ -107,7 +66,7 @@ export default async function NuevaCitaPage({
               name="medicoId"
               required
               defaultValue={params.medicoId}
-              className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
+              className={input}
             >
               <option value="" disabled>
                 Selecciona…
@@ -121,15 +80,10 @@ export default async function NuevaCitaPage({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="tipoConsultaId" className="text-sm font-medium text-[#1a1a1a]">
+            <label htmlFor="tipoConsultaId" className={labelClass}>
               Tipo de consulta
             </label>
-            <select
-              id="tipoConsultaId"
-              name="tipoConsultaId"
-              required
-              className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
-            >
+            <select id="tipoConsultaId" name="tipoConsultaId" required className={input}>
               <option value="" disabled>
                 Selecciona…
               </option>
@@ -143,7 +97,7 @@ export default async function NuevaCitaPage({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="fecha" className="text-sm font-medium text-[#1a1a1a]">
+              <label htmlFor="fecha" className={labelClass}>
                 Fecha
               </label>
               <input
@@ -152,43 +106,31 @@ export default async function NuevaCitaPage({
                 type="date"
                 required
                 defaultValue={params.fecha || hoyISO()}
-                className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
+                className={input}
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="hora" className="text-sm font-medium text-[#1a1a1a]">
+              <label htmlFor="hora" className={labelClass}>
                 Hora
               </label>
-              <input
-                id="hora"
-                name="hora"
-                type="time"
-                required
-                className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
-              />
+              <input id="hora" name="hora" type="time" required className={input} />
             </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="notas" className="text-sm font-medium text-[#1a1a1a]">
+            <label htmlFor="notas" className={labelClass}>
               Notas (opcional)
             </label>
-            <textarea
-              id="notas"
-              name="notas"
-              rows={2}
-              className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
-            />
+            <textarea id="notas" name="notas" rows={2} className={input} />
           </div>
 
           {params.error && (
-            <p className="text-sm text-[#d4183d]">{ERRORES[params.error] ?? "No se pudo agendar la cita."}</p>
+            <p className="text-sm text-[var(--color-danger)]">
+              {ERRORES[params.error] ?? "No se pudo agendar la cita."}
+            </p>
           )}
 
-          <button
-            type="submit"
-            className="mt-2 self-start rounded-md bg-[var(--color-brand-azul-funcional)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-          >
+          <button type="submit" className={`mt-2 self-start ${btnPrimary}`}>
             Agendar cita
           </button>
         </form>

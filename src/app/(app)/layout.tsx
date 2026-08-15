@@ -16,8 +16,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const { authUser, usuario } = await obtenerUsuarioActual();
 
   return (
-    <div className="flex min-h-full flex-1 flex-col">
-      <nav className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--color-border)] bg-[#0B1829] px-6 py-4">
+    <div className="flex min-h-full flex-1 flex-col bg-[var(--color-background)]">
+      <nav
+        className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 px-6 py-4"
+        style={{
+          background: "rgba(11,24,41,0.92)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(178,213,229,0.12)",
+        }}
+      >
         <div className="flex items-center gap-8">
           <SmallLogotype />
           <div className="flex items-center gap-5">
@@ -25,7 +33,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <Link
                 key={enlace.href}
                 href={enlace.href}
-                className="text-xs font-medium text-white/60 hover:text-white"
+                className="kicker text-white/55 transition-colors hover:text-white"
               >
                 {enlace.label}
               </Link>
@@ -33,14 +41,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-[10px] uppercase tracking-[0.14em] text-white/35">
+          <span className="kicker text-white/35">
             {usuario ? `${usuario.nombre} · ${usuario.rol}` : authUser.email}
           </span>
           <form action={cerrarSesion}>
-            <button
-              type="submit"
-              className="text-[10px] uppercase tracking-[0.18em] text-white/50 hover:text-white/80"
-            >
+            <button type="submit" className="kicker text-white/50 transition-colors hover:text-white/85">
               Cerrar sesión
             </button>
           </form>
@@ -48,13 +53,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </nav>
 
       {!usuario && (
-        <div className="bg-[#FBEAF0] px-6 py-2 text-center text-xs text-[#7a3049]">
+        <div className="bg-[var(--color-brand-rosa-claro)] px-6 py-2 text-center text-xs text-[#7a3049]">
           Tu cuenta existe en Supabase Auth pero no tiene fila en <code>usuarios</code> — pide
           a un Administrador que te dé de alta (rol) antes de usar el resto de la app.
         </div>
       )}
 
-      <main className="flex-1 px-6 py-8">{children}</main>
+      <main className="flex-1 px-6 py-10">{children}</main>
     </div>
   );
 }

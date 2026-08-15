@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { PageHeader, btnPrimary, input, label as labelClass } from "@/components/ui";
+import { BuscadorPaciente } from "@/components/PacienteBuscador";
 import { agregarAListaEspera } from "../actions";
 
 export default async function NuevaListaEsperaPage({
@@ -29,72 +30,30 @@ export default async function NuevaListaEsperaPage({
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="mb-6 text-lg font-semibold text-[var(--color-brand-azul-funcional)]">
-        Agregar a lista de espera
-      </h1>
+      <PageHeader kicker="Turnos" title="Agregar a lista de espera" />
+      <div className="mt-6">
+        <BuscadorPaciente
+          basePath="/lista-espera/nuevo"
+          pacienteSeleccionado={pacienteSeleccionado}
+          query={params.pacienteQ}
+          resultados={resultadosBusqueda}
+        />
+      </div>
 
-      {!pacienteSeleccionado ? (
-        <div>
-          <form className="flex gap-2">
-            <input
-              type="text"
-              name="pacienteQ"
-              defaultValue={params.pacienteQ}
-              placeholder="Buscar paciente por nombre o teléfono…"
-              className="w-full rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
-            />
-            <button type="submit" className="rounded-md border border-[var(--color-border)] px-4 py-2 text-sm">
-              Buscar
-            </button>
-          </form>
-          {resultadosBusqueda.length > 0 && (
-            <ul className="mt-3 divide-y divide-[var(--color-border)] rounded-lg border border-[var(--color-border)]">
-              {resultadosBusqueda.map((p) => (
-                <li key={p.id}>
-                  <Link
-                    href={`/lista-espera/nuevo?pacienteId=${p.id}`}
-                    className="block px-3 py-2 text-sm hover:bg-black/[0.02]"
-                  >
-                    {p.apellidos}, {p.nombre} — {p.telefono}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      ) : (
-        <>
-          <div className="mb-6 flex items-center justify-between rounded-md bg-black/[0.03] px-3 py-2 text-sm">
-            <span>
-              Paciente: <strong>{pacienteSeleccionado.apellidos}, {pacienteSeleccionado.nombre}</strong>
-            </span>
-            <Link href="/lista-espera/nuevo" className="text-xs text-[var(--color-brand-azul-funcional)] hover:underline">
-              Cambiar
-            </Link>
+      {pacienteSeleccionado && (
+        <form action={agregarAListaEspera} className="flex flex-col gap-4">
+          <input type="hidden" name="pacienteId" value={pacienteSeleccionado.id} />
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="motivo" className={labelClass}>
+              Motivo (consulta corta conocida)
+            </label>
+            <input id="motivo" name="motivo" required className={input} />
           </div>
-
-          <form action={agregarAListaEspera} className="flex flex-col gap-4">
-            <input type="hidden" name="pacienteId" value={pacienteSeleccionado.id} />
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="motivo" className="text-sm font-medium text-[#1a1a1a]">
-                Motivo (consulta corta conocida)
-              </label>
-              <input
-                id="motivo"
-                name="motivo"
-                required
-                className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
-              />
-            </div>
-            {params.error && <p className="text-sm text-[#d4183d]">El motivo es obligatorio.</p>}
-            <button
-              type="submit"
-              className="mt-2 self-start rounded-md bg-[var(--color-brand-azul-funcional)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-            >
-              Agregar a la lista
-            </button>
-          </form>
-        </>
+          {params.error && <p className="text-sm text-[var(--color-danger)]">El motivo es obligatorio.</p>}
+          <button type="submit" className={`mt-2 self-start ${btnPrimary}`}>
+            Agregar a la lista
+          </button>
+        </form>
       )}
     </div>
   );

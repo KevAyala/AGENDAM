@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { PageHeader, Badge, Kicker, card, cardRow, linkAction, type Tono } from "@/components/ui";
 import { PacienteForm } from "../PacienteForm";
 import { actualizarPaciente } from "../actions";
 
@@ -8,6 +9,15 @@ const FORMATO_FECHA = new Intl.DateTimeFormat("es-MX", {
   dateStyle: "medium",
   timeStyle: "short",
 });
+
+const TONO_ESTADO: Record<string, Tono> = {
+  AGENDADA: "neutral",
+  CONFIRMADA: "success",
+  REPROGRAMADA: "warning",
+  CANCELADA: "strike",
+  COMPLETADA: "neutral",
+  NO_ASISTIO: "danger",
+};
 
 export default async function EditarPacientePage({
   params,
@@ -36,46 +46,35 @@ export default async function EditarPacientePage({
   const actualizarConId = actualizarPaciente.bind(null, paciente.id);
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-8">
+    <div className="mx-auto flex max-w-xl flex-col gap-10">
       <div>
-        <h1 className="mb-6 text-lg font-semibold text-[var(--color-brand-azul-funcional)]">
-          {paciente.apellidos}, {paciente.nombre}
-        </h1>
-        {guardado === "1" && (
-          <p className="mb-4 text-sm text-green-700">Cambios guardados.</p>
-        )}
-        <PacienteForm
-          action={actualizarConId}
-          valores={paciente}
-          error={error}
-          textoBoton="Guardar cambios"
-        />
+        <PageHeader kicker="Paciente" title={`${paciente.apellidos}, ${paciente.nombre}`} />
+        {guardado === "1" && <p className="mt-3 text-sm text-[var(--color-success)]">Cambios guardados.</p>}
+        <div className={`mt-6 p-6 ${card}`}>
+          <PacienteForm action={actualizarConId} valores={paciente} error={error} textoBoton="Guardar cambios" />
+        </div>
       </div>
 
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[#1a1a1a]">Próximas citas</h2>
-          <Link
-            href={`/agenda/nueva?pacienteId=${paciente.id}`}
-            className="text-xs font-medium text-[var(--color-brand-azul-funcional)] hover:underline"
-          >
+          <Kicker>Próximas citas</Kicker>
+          <Link href={`/agenda/nueva?pacienteId=${paciente.id}`} className={linkAction}>
             + Nueva cita
           </Link>
         </div>
         {paciente.citas.length === 0 ? (
-          <p className="text-sm text-black/40">Sin citas próximas.</p>
+          <p className="text-sm text-[var(--color-foreground-faint)]">Sin citas próximas.</p>
         ) : (
-          <ul className="divide-y divide-[var(--color-border)] rounded-lg border border-[var(--color-border)]">
+          <div className={card}>
             {paciente.citas.map((c) => (
-              <li key={c.id} className="flex items-center justify-between px-4 py-3 text-sm">
-                <span>
-                  {FORMATO_FECHA.format(c.fechaHoraInicio)} · Dr(a). {c.medico.nombre} ·{" "}
-                  {c.tipoConsulta.nombre}
+              <div key={c.id} className={`flex items-center justify-between ${cardRow}`}>
+                <span className="text-sm">
+                  {FORMATO_FECHA.format(c.fechaHoraInicio)} · Dr(a). {c.medico.nombre} · {c.tipoConsulta.nombre}
                 </span>
-                <span className="text-xs uppercase tracking-wide text-black/40">{c.estado}</span>
-              </li>
+                <Badge tone={TONO_ESTADO[c.estado]}>{c.estado}</Badge>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>

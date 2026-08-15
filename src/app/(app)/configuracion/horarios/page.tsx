@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { PageHeader, card, btnPrimary } from "@/components/ui";
 import { guardarHorario } from "./actions";
 
 const NOMBRES_DIA = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -33,27 +34,26 @@ export default async function HorariosPage({
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <h1 className="text-lg font-semibold text-[var(--color-brand-azul-funcional)]">
-        Horario laboral por médico
-      </h1>
-      <p className="text-xs text-black/40">
-        Hasta {RANGOS_POR_DIA} franjas por día (ej. Lun/Mié/Vie 11:00–14:00 y 17:00–20:40) — RF-029b.
-      </p>
+      <PageHeader
+        kicker="RF-029b"
+        title="Horario laboral por médico"
+        subtitle={`Hasta ${RANGOS_POR_DIA} franjas por día (ej. Lun/Mié/Vie 11:00–14:00 y 17:00–20:40).`}
+      />
 
       {medicos.length === 0 ? (
-        <p className="text-sm text-black/40">Todavía no hay médicos dados de alta.</p>
+        <p className="text-sm text-[var(--color-foreground-faint)]">Todavía no hay médicos dados de alta.</p>
       ) : (
         <>
-          <form className="flex items-end gap-3">
+          <form className={`flex items-end gap-3 p-4 ${card}`}>
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="medicoId" className="text-xs font-medium text-black/50">
+              <label htmlFor="medicoId" className="text-xs font-medium text-[var(--color-foreground-muted)]">
                 Médico
               </label>
               <select
                 id="medicoId"
                 name="medicoId"
                 defaultValue={medicoId}
-                className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
+                className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm"
               >
                 {medicos.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -62,18 +62,21 @@ export default async function HorariosPage({
                 ))}
               </select>
             </div>
-            <button type="submit" className="rounded-md border border-[var(--color-border)] px-4 py-2 text-sm">
+            <button
+              type="submit"
+              className="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm font-medium hover:border-[var(--color-brand-azul-funcional)]"
+            >
               Ver
             </button>
           </form>
 
-          {params.guardado === "1" && <p className="text-sm text-green-700">Horario guardado.</p>}
+          {params.guardado === "1" && <p className="text-sm text-[var(--color-success)]">Horario guardado.</p>}
 
           {guardarConId && (
-            <form action={guardarConId} className="flex flex-col gap-3">
+            <form action={guardarConId} className={`flex flex-col gap-4 p-5 ${card}`}>
               {NOMBRES_DIA.map((nombreDia, dia) => (
                 <div key={dia} className="grid grid-cols-[100px_1fr] items-center gap-3 text-sm">
-                  <span className="font-medium text-[#1a1a1a]">{nombreDia}</span>
+                  <span className="font-semibold text-[var(--color-foreground)]">{nombreDia}</span>
                   <div className="flex gap-3">
                     {Array.from({ length: RANGOS_POR_DIA }, (_, rango) => (
                       <div key={rango} className="flex items-center gap-1.5">
@@ -83,7 +86,7 @@ export default async function HorariosPage({
                           defaultValue={franjasPorDia[dia][rango]?.horaInicio}
                           className="w-24 rounded-md border border-[var(--color-border)] px-2 py-1"
                         />
-                        <span className="text-black/30">–</span>
+                        <span className="text-[var(--color-foreground-faint)]">–</span>
                         <input
                           type="time"
                           name={`dia${dia}_fin${rango}`}
@@ -95,10 +98,7 @@ export default async function HorariosPage({
                   </div>
                 </div>
               ))}
-              <button
-                type="submit"
-                className="mt-2 self-start rounded-md bg-[var(--color-brand-azul-funcional)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-              >
+              <button type="submit" className={`mt-2 self-start ${btnPrimary}`}>
                 Guardar horario
               </button>
             </form>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { obtenerUltimoMedicoId } from "@/lib/ultimo-medico";
+import { PageHeader, Kicker, Badge, card, cardRow, btnPrimary, btnSecondarySm, linkAction, linkDanger, linkMuted, type Tono } from "@/components/ui";
 import { minutosEsperando, ordenarCola } from "./cola";
 import {
   cancelarTurno,
@@ -17,6 +18,12 @@ const ETIQUETA_TIPO: Record<string, string> = {
   CITA_AGENDADA: "Cita",
   APLICACION: "Aplicación",
   SIN_CITA: "Sin cita",
+};
+
+const TONO_TIPO: Record<string, Tono> = {
+  CITA_AGENDADA: "info",
+  APLICACION: "warning",
+  SIN_CITA: "neutral",
 };
 
 function hoyISO() {
@@ -38,7 +45,7 @@ export default async function TurnosPage({
 
   if (!medicoId) {
     return (
-      <div className="mx-auto max-w-2xl text-sm text-black/40">
+      <div className="mx-auto max-w-2xl text-sm text-[var(--color-foreground-faint)]">
         Todavía no hay médicos dados de alta.
       </div>
     );
@@ -72,27 +79,27 @@ export default async function TurnosPage({
   const cola = ordenarCola(turnosDelDia);
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-[var(--color-brand-azul-funcional)]">Turnos — hoy</h1>
-        <Link
-          href={`/turnos/nuevo?medicoId=${medicoId}`}
-          className="rounded-md bg-[var(--color-brand-azul-funcional)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
-        >
-          + Aplicación / sin cita
-        </Link>
-      </div>
+    <div className="mx-auto flex max-w-3xl flex-col gap-9">
+      <PageHeader
+        kicker="Fase 2"
+        title="Turnos — hoy"
+        action={
+          <Link href={`/turnos/nuevo?medicoId=${medicoId}`} className={btnPrimary}>
+            + Aplicación / sin cita
+          </Link>
+        }
+      />
 
-      <form action={filtrarTurnos} className="flex items-end gap-3">
+      <form action={filtrarTurnos} className={`flex items-end gap-3 p-4 ${card}`}>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="medicoId" className="text-xs font-medium text-black/50">
+          <label htmlFor="medicoId" className="text-xs font-medium text-[var(--color-foreground-muted)]">
             Médico
           </label>
           <select
             id="medicoId"
             name="medicoId"
             defaultValue={medicoId}
-            className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
+            className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm"
           >
             {medicos.map((m) => (
               <option key={m.id} value={m.id}>
@@ -101,136 +108,136 @@ export default async function TurnosPage({
             ))}
           </select>
         </div>
-        <button type="submit" className="rounded-md border border-[var(--color-border)] px-4 py-2 text-sm">
+        <button
+          type="submit"
+          className="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm font-medium hover:border-[var(--color-brand-azul-funcional)]"
+        >
           Ver
         </button>
       </form>
 
       {/* En atención ahora */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-[#1a1a1a]">En atención</h2>
+        <Kicker className="mb-2.5 block">En atención</Kicker>
         {enAtencion ? (
-          <div className="rounded-lg border border-[var(--color-brand-azul-funcional)] bg-[#FBEAF0]/30 px-4 py-3">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">
+          <div
+            className="rounded-2xl px-5 py-4"
+            style={{
+              background: "linear-gradient(135deg, rgba(178,213,229,0.16) 0%, rgba(251,234,240,0.35) 100%)",
+              border: "1px solid rgba(47,111,148,0.25)",
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-[var(--color-foreground)]">
                 {enAtencion.paciente.apellidos}, {enAtencion.paciente.nombre}
               </span>
-              <span className="text-xs uppercase tracking-wide text-black/40">
-                {ETIQUETA_TIPO[enAtencion.tipo]}
-              </span>
+              <Badge tone={TONO_TIPO[enAtencion.tipo]}>{ETIQUETA_TIPO[enAtencion.tipo]}</Badge>
             </div>
-            <form action={finalizarAtencion.bind(null, enAtencion.id)} className="mt-3 flex items-end gap-2">
+            <form action={finalizarAtencion.bind(null, enAtencion.id)} className="mt-4 flex items-end gap-2">
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-black/50">Monto a cobrar (RF-038)</label>
+                <label className="text-xs font-medium text-[var(--color-foreground-muted)]">
+                  Monto a cobrar (RF-038)
+                </label>
                 <input
                   type="number"
                   name="montoACobrar"
                   step="0.01"
                   min="0"
-                  className="w-32 rounded-md border border-[var(--color-border)] px-2 py-1 text-sm"
+                  className="w-32 rounded-lg border border-[var(--color-border)] bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[var(--color-brand-azul-funcional)]"
                 />
               </div>
-              <button
-                type="submit"
-                className="rounded-md bg-[var(--color-brand-azul-funcional)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
-              >
+              <button type="submit" className={btnPrimary}>
                 Finalizar consulta
               </button>
             </form>
           </div>
         ) : (
-          <p className="text-sm text-black/40">Nadie en atención en este momento.</p>
+          <p className="text-sm text-[var(--color-foreground-faint)]">Nadie en atención en este momento.</p>
         )}
       </div>
 
       {/* Cola de espera */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-[#1a1a1a]">
-          Cola de espera{" "}
-          <span className="font-normal text-black/40">— orden de llegada / cita, RF-035</span>
-        </h2>
+        <Kicker className="mb-2.5 block">
+          Cola de espera <span className="normal-case tracking-normal opacity-60">— RF-035</span>
+        </Kicker>
         {cola.length === 0 ? (
-          <p className="text-sm text-black/40">Sin pacientes en espera.</p>
+          <p className="text-sm text-[var(--color-foreground-faint)]">Sin pacientes en espera.</p>
         ) : (
-          <ol className="divide-y divide-[var(--color-border)] rounded-lg border border-[var(--color-border)]">
+          <div className={card}>
             {cola.map((t, i) => {
-              const iniciarConId = iniciarAtencion.bind(null, t.id);
-              const cancelarConId = cancelarTurno.bind(null, t.id);
-              const noAsistioConId = marcarNoAsistio.bind(null, t.id);
               const espera = minutosEsperando(t);
 
               return (
-                <li key={t.id} className="flex items-center justify-between px-4 py-3 text-sm">
+                <div key={t.id} className={`flex items-center justify-between ${cardRow}`}>
                   <div>
-                    <span className="mr-2 font-mono text-xs text-black/30">{i + 1}</span>
-                    <span className="font-medium">
-                      {t.paciente.apellidos}, {t.paciente.nombre}
-                    </span>{" "}
-                    <span className="text-xs uppercase tracking-wide text-black/40">
-                      {ETIQUETA_TIPO[t.tipo]}
-                    </span>
-                    {t.cita && (
-                      <span className="ml-2 text-xs text-black/30">
-                        cita {FORMATO_HORA.format(t.cita.fechaHoraInicio)} · {t.cita.tipoConsulta.nombre}
+                    <div className="flex items-center gap-2">
+                      <span className="kicker text-[var(--color-foreground-faint)]">{i + 1}</span>
+                      <span className="text-sm font-semibold text-[var(--color-foreground)]">
+                        {t.paciente.apellidos}, {t.paciente.nombre}
                       </span>
-                    )}
-                    <div className={`text-xs ${espera >= 30 ? "text-[#d4183d]" : "text-black/30"}`}>
+                      <Badge tone={TONO_TIPO[t.tipo]}>{ETIQUETA_TIPO[t.tipo]}</Badge>
+                      {t.cita && (
+                        <span className="text-xs text-[var(--color-foreground-faint)]">
+                          cita {FORMATO_HORA.format(t.cita.fechaHoraInicio)} · {t.cita.tipoConsulta.nombre}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      className={`mt-1 text-xs font-medium ${espera >= 30 ? "text-[var(--color-danger)]" : "text-[var(--color-foreground-faint)]"}`}
+                    >
                       esperando {espera} min
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     {!enAtencion && (
-                      <form action={iniciarConId}>
-                        <button type="submit" className="text-xs text-green-700 hover:underline">
+                      <form action={iniciarAtencion.bind(null, t.id)}>
+                        <button type="submit" className={linkAction} style={{ color: "var(--color-success)" }}>
                           Iniciar
                         </button>
                       </form>
                     )}
-                    <form action={noAsistioConId}>
-                      <button type="submit" className="text-xs text-black/40 hover:underline">
+                    <form action={marcarNoAsistio.bind(null, t.id)}>
+                      <button type="submit" className={linkMuted}>
                         No asistió
                       </button>
                     </form>
-                    <form action={cancelarConId}>
-                      <button type="submit" className="text-xs text-[#d4183d] hover:underline">
+                    <form action={cancelarTurno.bind(null, t.id)}>
+                      <button type="submit" className={linkDanger}>
                         Cancelar
                       </button>
                     </form>
                   </div>
-                </li>
+                </div>
               );
             })}
-          </ol>
+          </div>
         )}
       </div>
 
       {/* Citas de hoy sin llegada registrada */}
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-[#1a1a1a]">Citas de hoy — registrar llegada</h2>
+        <Kicker className="mb-2.5 block">Citas de hoy — registrar llegada</Kicker>
         {citasSinLlegada.length === 0 ? (
-          <p className="text-sm text-black/40">No hay citas pendientes de llegada para hoy.</p>
+          <p className="text-sm text-[var(--color-foreground-faint)]">No hay citas pendientes de llegada para hoy.</p>
         ) : (
-          <ul className="divide-y divide-[var(--color-border)] rounded-lg border border-[var(--color-border)]">
-            {citasSinLlegada.map((c) => {
-              const registrarConId = registrarLlegadaCita.bind(null, c.id);
-              return (
-                <li key={c.id} className="flex items-center justify-between px-4 py-3 text-sm">
-                  <span>
-                    {FORMATO_HORA.format(c.fechaHoraInicio)} · {c.paciente.apellidos}, {c.paciente.nombre} ·{" "}
-                    {c.tipoConsulta.nombre}
-                  </span>
-                  <form action={registrarConId}>
-                    <button
-                      type="submit"
-                      className="rounded-md border border-[var(--color-border)] px-2 py-1 text-xs hover:border-[var(--color-brand-azul-funcional)]"
-                    >
-                      Llegó
-                    </button>
-                  </form>
-                </li>
-              );
-            })}
-          </ul>
+          <div className={card}>
+            {citasSinLlegada.map((c) => (
+              <div key={c.id} className={`flex items-center justify-between ${cardRow}`}>
+                <span className="text-sm">
+                  <span className="font-semibold text-[var(--color-foreground)]">
+                    {FORMATO_HORA.format(c.fechaHoraInicio)}
+                  </span>{" "}
+                  · {c.paciente.apellidos}, {c.paciente.nombre} · {c.tipoConsulta.nombre}
+                </span>
+                <form action={registrarLlegadaCita.bind(null, c.id)}>
+                  <button type="submit" className={btnSecondarySm}>
+                    Llegó
+                  </button>
+                </form>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

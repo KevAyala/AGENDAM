@@ -3,13 +3,19 @@
 /* Tokens de marca — Documento 05 (Identidad de Marca) §2-3.
    UI funcional del software en tema claro por defecto: el fondo oscuro +
    glassmorphism del Documento 05 es el tratamiento de la página de marca,
-   no el de la app de trabajo diario de recepción/médico. */
+   no el de la app de trabajo diario de recepción/médico — pero sí toma de
+   ahí la disciplina de color, la tipografía (Nunito + DM Mono en kickers
+   con tracking amplio) y el lenguaje de tarjetas "premium" con sombra
+   suave en vez de tablas planas. */
 :root {
   --background: #FAF9F7;
-  --foreground: #1a1a1a;
+  --foreground: #16222E;
+  --foreground-muted: rgba(22, 34, 46, 0.5);
+  --foreground-faint: rgba(22, 34, 46, 0.32);
 
   --color-brand-azul-principal: #B2D5E5;
   --color-brand-azul-funcional: #2F6F94;
+  --color-brand-azul-oscuro: #0B1829;
   --color-brand-rosa-acento: #D4537E;
   --color-brand-rosa-claro: #FBEAF0;
   --color-brand-blanco-calido: #FAF9F7;
@@ -18,19 +24,35 @@
   --primary-foreground: #FAF9F7;
   --accent: var(--color-brand-rosa-acento);
   --accent-foreground: #FAF9F7;
-  --border: #e4e4e4;
+
+  --surface: #FFFFFF;
+  --border: rgba(22, 34, 46, 0.1);
+  --border-soft: rgba(22, 34, 46, 0.07);
+
+  --success: #2F7A4F;
+  --danger: #D4183D;
+
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px rgba(11, 24, 41, 0.04), 0 10px 28px -14px rgba(11, 24, 41, 0.18);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-faint: var(--foreground-faint);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-surface: var(--surface);
   --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
   --color-brand-azul-principal: var(--color-brand-azul-principal);
   --color-brand-azul-funcional: var(--color-brand-azul-funcional);
+  --color-brand-azul-oscuro: var(--color-brand-azul-oscuro);
   --color-brand-rosa-acento: var(--color-brand-rosa-acento);
   --color-brand-rosa-claro: var(--color-brand-rosa-claro);
   --color-brand-blanco-calido: var(--color-brand-blanco-calido);
@@ -42,4 +64,15 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-nunito), sans-serif;
+}
+
+/* Kicker — label técnico en DM Mono, mayúsculas, tracking amplio. Marca
+   registrada en toda la página de identidad (Documento 05); es la seña de
+   identidad tipográfica más distintiva y la que faltaba en el resto de la
+   app. */
+.kicker {
+  font-family: var(--font-dm-mono), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.6875rem;
 }
