@@ -14,8 +14,17 @@
 // criterio estándar de agenda clínica donde faltó detalle. Revisar contra
 // el v0.1 original si aparece.
 //
-// Turno, Consulta (nota clínica), ListaEspera, CatalogoMedicamento y
-// ConversacionWhatsApp llegan en las fases donde el SRS los introduce.
+// Fase 2 — Turnos (Documento 03 §5): Turno (RF-030..039, RF-035/035a-e) y
+// ListaEspera (RF-035c, diccionario §6.5a). El diccionario §6.6 pone
+// `monto_a_cobrar` (RF-038) como campo de la entidad Consulta — pero
+// Consulta (nota clínica con diagnóstico/NOM-004) es de Fase 4 y no se
+// adelanta aquí. Se pone `montoACobrar` directo en Turno: RF-038 solo pide
+// que el médico lo registre "al finalizar la consulta" (la visita, en
+// sentido coloquial), no que exista ya el expediente clínico. Revisar si
+// conviene migrarlo a Consulta cuando llegue Fase 4.
+//
+// Consulta (nota clínica), CatalogoMedicamento y ConversacionWhatsApp
+// llegan en las fases donde el SRS los introduce.
 
 generator client {
   provider = "prisma-client-js"
@@ -49,10 +58,11 @@ model Usuario {
   creadoEn      DateTime @default(now())
   actualizadoEn DateTime @updatedAt
 
-  bitacora        BitacoraAuditoria[]
-  horarios        HorarioMedico[]
-  citasComoMedico Cita[]              @relation("CitasMedico")
-  citasCreadas    Cita[]              @relation("CitasCreadas")
+  bitacora         BitacoraAuditoria[]
+  horarios         HorarioMedico[]
+  citasComoMedico  Cita[]              @relation("CitasMedico")
+  citasCreadas     Cita[]              @relation("CitasCreadas")
+  turnosComoMedico Turno[]             @relation("TurnosMedico")
 
   @@map("usuarios")
 }
@@ -88,7 +98,9 @@ model Paciente {
   creadoEn        DateTime  @default(now())
   actualizadoEn   DateTime  @updatedAt
 
-  citas Cita[]
+  citas       Cita[]
+  turnos      Turno[]
+  listaEspera ListaEspera[]
 
   @@index([nombre, apellidos])
   @@map("pacientes")
@@ -153,7 +165,82 @@ model Cita {
   creadoEn        DateTime     @default(now())
   actualizadoEn   DateTime     @updatedAt
 
+  turno Turno?
+
   @@index([medicoId, fechaHoraInicio])
   @@index([pacienteId])
   @@map("citas")
+}
+
+enum TipoTurno {
+  CITA_AGENDADA
+  // RF-039: 5 min, no se agenda — se atiende por orden de llegada con la
+  // regla de los 30 minutos (RF-035a).
+  APLICACION
+  // RF-035b: paciente llega sin cita pidiendo consulta regular y se le da
+  // lugar el mismo día. No está en el diccionario original (§6.5 solo
+  // enumera cita_agendada/aplicacion) — se agrega para distinguirlo de
+  // APLICACION, que tiene su propia regla de inserción distinta.
+  SIN_CITA
+}
+
+enum EstadoTurno {
+  EN_ESPERA
+  EN_ATENCION
+  COMPLETADO
+  CANCELADO
+  NO_ASISTIO
+}
+
+// RF-030..039: registro de llegada, turno y cola de espera por médico.
+// Diccionario §6.5: `tipo` y `horaInicioEspera` (para la regla de los 30
+// minutos, RF-035a) son los campos que ese diccionario agrega sobre un
+// Turno base de v0.1 que no está disponible — el resto de los campos se
+// diseñó con criterio estándar de sala de espera clínica.
+model Turno {
+  id                 String      @id @default(cuid())
+  pacienteId         String
+  paciente           Paciente    @relation(fields: [pacienteId], references: [id])
+  medicoId           String
+  medico             Usuario     @relation("TurnosMedico", fields: [medicoId], references: [id])
+  citaId             String?     @unique
+  cita               Cita?       @relation(fields: [citaId], references: [id])
+  tipo               TipoTurno
+  estado             EstadoTurno @default(EN_ESPERA)
+  horaLlegada        DateTime    @default(now())
+  horaInicioEspera   DateTime    @default(now())
+  horaInicioAtencion DateTime?
+  horaFinAtencion    DateTime?
+  // RF-038/038a: lo registra el médico al finalizar, lo consulta recepción.
+  montoACobrar       Decimal?    @db.Decimal(10, 2)
+  creadoEn           DateTime    @default(now())
+  actualizadoEn      DateTime    @updatedAt
+
+  @@index([medicoId, estado])
+  @@index([pacienteId])
+  @@map("turnos")
+}
+
+enum EstatusListaEspera {
+  EN_ESPERA
+  ASIGNADA
+  CANCELADA
+}
+
+// RF-035c: pacientes con consultas cortas conocidas que el médico puede
+// atender entre pacientes agendados — distinto del flujo de Turno. RF-035d
+// (ofrecer automáticamente el lugar liberado por una cancelación) no se
+// automatiza en esta fase: requeriría un canal de notificación que todavía
+// no existe (WhatsApp llega en Fase 3) — por ahora la reasignación es
+// manual (recepción marca ASIGNADA a mano).
+model ListaEspera {
+  id            String             @id @default(cuid())
+  pacienteId    String
+  paciente      Paciente           @relation(fields: [pacienteId], references: [id])
+  motivo        String
+  fechaRegistro DateTime           @default(now())
+  estatus       EstatusListaEspera @default(EN_ESPERA)
+
+  @@index([estatus])
+  @@map("lista_espera")
 }

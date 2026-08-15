@@ -4,6 +4,8 @@ import { obtenerUsuarioActual } from "@/lib/current-user";
 const ACCESOS = [
   { href: "/pacientes", titulo: "Pacientes", desc: "Registrar y buscar pacientes." },
   { href: "/agenda", titulo: "Agenda", desc: "Ver y crear citas por médico." },
+  { href: "/turnos", titulo: "Turnos", desc: "Cola de espera del día, por médico." },
+  { href: "/lista-espera", titulo: "Lista de espera", desc: "Consultas cortas pendientes de hueco." },
   { href: "/configuracion/horarios", titulo: "Horarios", desc: "Configurar el horario laboral de cada médico." },
 ];
 
@@ -26,7 +28,7 @@ export default async function Home() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {ACCESOS.map((a) => (
           <Link
             key={a.href}

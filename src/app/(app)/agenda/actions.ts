@@ -5,6 +5,16 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { registrarBitacora } from "@/lib/audit";
 import { obtenerUsuarioActual } from "@/lib/current-user";
+import { guardarUltimoMedicoId } from "@/lib/ultimo-medico";
+
+// RF-035e: recuerda el médico elegido para la próxima vez que se abra la
+// Agenda o Turnos.
+export async function filtrarAgenda(formData: FormData) {
+  const medicoId = String(formData.get("medicoId") ?? "");
+  const fecha = String(formData.get("fecha") ?? "");
+  if (medicoId) await guardarUltimoMedicoId(medicoId);
+  redirect(`/agenda?medicoId=${medicoId}&fecha=${fecha}`);
+}
 
 /**
  * Valida que la nueva cita no se traslape con otra cita activa del mismo

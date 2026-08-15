@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { cancelarCita, confirmarCita, reprogramarCita } from "./actions";
+import { obtenerUltimoMedicoId } from "@/lib/ultimo-medico";
+import { cancelarCita, confirmarCita, filtrarAgenda, reprogramarCita } from "./actions";
 
 const FORMATO_HORA = new Intl.DateTimeFormat("es-MX", { timeStyle: "short" });
 
@@ -30,7 +31,7 @@ export default async function AgendaPage({
     orderBy: { nombre: "asc" },
   });
 
-  const medicoId = params.medicoId || medicos[0]?.id;
+  const medicoId = params.medicoId || (await obtenerUltimoMedicoId()) || medicos[0]?.id;
 
   const inicioDia = new Date(`${fecha}T00:00:00`);
   const finDia = new Date(`${fecha}T23:59:59`);
@@ -61,7 +62,7 @@ export default async function AgendaPage({
         </p>
       ) : (
         <>
-          <form className="flex flex-wrap items-end gap-3">
+          <form action={filtrarAgenda} className="flex flex-wrap items-end gap-3">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="medicoId" className="text-xs font-medium text-black/50">
                 Médico

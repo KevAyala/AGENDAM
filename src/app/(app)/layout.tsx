@@ -7,6 +7,8 @@ const ENLACES = [
   { href: "/", label: "Inicio" },
   { href: "/pacientes", label: "Pacientes" },
   { href: "/agenda", label: "Agenda" },
+  { href: "/turnos", label: "Turnos" },
+  { href: "/lista-espera", label: "Lista de espera" },
   { href: "/configuracion/horarios", label: "Horarios" },
 ];
 
