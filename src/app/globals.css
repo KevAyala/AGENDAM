@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* Tokens de marca — Documento 05 (Identidad de Marca) §2-3.
+   UI funcional del software en tema claro por defecto: el fondo oscuro +
+   glassmorphism del Documento 05 es el tratamiento de la página de marca,
+   no el de la app de trabajo diario de recepción/médico. */
+:root {
+  --background: #FAF9F7;
+  --foreground: #1a1a1a;
+
+  --color-brand-azul-principal: #B2D5E5;
+  --color-brand-azul-funcional: #2F6F94;
+  --color-brand-rosa-acento: #D4537E;
+  --color-brand-rosa-claro: #FBEAF0;
+  --color-brand-blanco-calido: #FAF9F7;
+
+  --primary: var(--color-brand-azul-funcional);
+  --primary-foreground: #FAF9F7;
+  --accent: var(--color-brand-rosa-acento);
+  --accent-foreground: #FAF9F7;
+  --border: #e4e4e4;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-brand-azul-principal: var(--color-brand-azul-principal);
+  --color-brand-azul-funcional: var(--color-brand-azul-funcional);
+  --color-brand-rosa-acento: var(--color-brand-rosa-acento);
+  --color-brand-rosa-claro: var(--color-brand-rosa-claro);
+  --color-brand-blanco-calido: var(--color-brand-blanco-calido);
+  --font-sans: var(--font-nunito);
+  --font-mono: var(--font-dm-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-nunito), sans-serif;
+}

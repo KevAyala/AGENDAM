@@ -1,0 +1,58 @@
+// Esquema de base de datos por consultorio (Documento 03 §3: una base de
+// datos Postgres separada por consultorio, mismo esquema para todas).
+//
+// Fase 0 — Fundaciones (Documento 03 §5): solo se modelan Usuario (roles y
+// acceso) y BitacoraAuditoria (transversal desde el inicio, RF-080/081).
+// Paciente, Cita, Turno, Consulta, ListaEspera, CatalogoMedicamento y
+// ConversacionWhatsApp llegan en las fases donde el SRS los introduce
+// (Documento 04 §6) — no se adelantan aquí para no fijar un modelo de datos
+// que todavía puede cambiar antes de esas fases.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Roles definidos en Documento 04 §5 (tabla de permisos).
+enum Rol {
+  MEDICO
+  RECEPCION
+  ADMIN
+}
+
+// El id coincide con el uid de Supabase Auth (auth.users.id) — se crea la
+// fila en esta tabla justo después del alta en Supabase Auth, nunca antes
+// (ver src/lib/supabase y la nota en README sobre alta de usuarios).
+model Usuario {
+  id            String   @id
+  nombre        String
+  email         String   @unique
+  rol           Rol
+  activo        Boolean  @default(true)
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  bitacora BitacoraAuditoria[]
+
+  @@map("usuarios")
+}
+
+// RF-080/081 (Documento 04 §3.9) + diccionario de datos §6.8.
+// Retención mínima de 5 años (RNF-03a) — se administra a nivel de política
+// de base de datos / backups, no de borrado aplicativo.
+model BitacoraAuditoria {
+  id              String   @id @default(cuid())
+  usuarioId       String
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id])
+  accion          String
+  entidadAfectada String?
+  fechaHora       DateTime @default(now())
+
+  @@index([usuarioId])
+  @@index([fechaHora])
+  @@map("bitacora_auditoria")
+}
