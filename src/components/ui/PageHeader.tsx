@@ -12,11 +12,11 @@ export function PageHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="flex flex-wrap items-start justify-between gap-5">
       <div>
-        {kicker && <Kicker className="mb-1.5 block">{kicker}</Kicker>}
-        <h1 className="text-xl font-bold text-[var(--color-foreground)]">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-[var(--color-foreground-muted)]">{subtitle}</p>}
+        {kicker && <Kicker className="mb-2 block">{kicker}</Kicker>}
+        <h1 className="text-3xl font-extrabold tracking-tight text-[var(--color-foreground)]">{title}</h1>
+        {subtitle && <p className="mt-2 max-w-xl text-[15px] text-[var(--color-foreground-muted)]">{subtitle}</p>}
       </div>
       {action}
     </div>

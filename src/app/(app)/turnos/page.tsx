@@ -99,7 +99,7 @@ export default async function TurnosPage({
             id="medicoId"
             name="medicoId"
             defaultValue={medicoId}
-            className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm"
+            className="rounded-lg border border-[var(--color-border)] bg-white/80 px-3.5 py-2.5 text-[15px]"
           >
             {medicos.map((m) => (
               <option key={m.id} value={m.id}>
@@ -110,7 +110,7 @@ export default async function TurnosPage({
         </div>
         <button
           type="submit"
-          className="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm font-medium hover:border-[var(--color-brand-azul-funcional)]"
+          className="rounded-lg border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-semibold backdrop-blur hover:border-[var(--color-brand-azul-funcional)]"
         >
           Ver
         </button>
@@ -121,14 +121,14 @@ export default async function TurnosPage({
         <Kicker className="mb-2.5 block">En atención</Kicker>
         {enAtencion ? (
           <div
-            className="rounded-2xl px-5 py-4"
+            className="rounded-2xl px-6 py-5 backdrop-blur-xl"
             style={{
-              background: "linear-gradient(135deg, rgba(178,213,229,0.16) 0%, rgba(251,234,240,0.35) 100%)",
+              background: "linear-gradient(135deg, rgba(178,213,229,0.28) 0%, rgba(251,234,240,0.45) 100%)",
               border: "1px solid rgba(47,111,148,0.25)",
             }}
           >
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-[var(--color-foreground)]">
+              <span className="text-lg font-bold text-[var(--color-foreground)]">
                 {enAtencion.paciente.apellidos}, {enAtencion.paciente.nombre}
               </span>
               <Badge tone={TONO_TIPO[enAtencion.tipo]}>{ETIQUETA_TIPO[enAtencion.tipo]}</Badge>
@@ -173,18 +173,18 @@ export default async function TurnosPage({
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="kicker text-[var(--color-foreground-faint)]">{i + 1}</span>
-                      <span className="text-sm font-semibold text-[var(--color-foreground)]">
+                      <span className="text-[15px] font-semibold text-[var(--color-foreground)]">
                         {t.paciente.apellidos}, {t.paciente.nombre}
                       </span>
                       <Badge tone={TONO_TIPO[t.tipo]}>{ETIQUETA_TIPO[t.tipo]}</Badge>
                       {t.cita && (
-                        <span className="text-xs text-[var(--color-foreground-faint)]">
+                        <span className="text-sm text-[var(--color-foreground-faint)]">
                           cita {FORMATO_HORA.format(t.cita.fechaHoraInicio)} · {t.cita.tipoConsulta.nombre}
                         </span>
                       )}
                     </div>
                     <div
-                      className={`mt-1 text-xs font-medium ${espera >= 30 ? "text-[var(--color-danger)]" : "text-[var(--color-foreground-faint)]"}`}
+                      className={`mt-1.5 text-sm font-medium ${espera >= 30 ? "text-[var(--color-danger)]" : "text-[var(--color-foreground-faint)]"}`}
                     >
                       esperando {espera} min
                     </div>

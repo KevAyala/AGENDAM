@@ -46,7 +46,7 @@ export default async function AgendaPage({
     : [];
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+    <div className="mx-auto flex max-w-3xl flex-col gap-8">
       <PageHeader
         kicker="Núcleo"
         title="Agenda"
@@ -72,7 +72,7 @@ export default async function AgendaPage({
                 id="medicoId"
                 name="medicoId"
                 defaultValue={medicoId}
-                className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm"
+                className="rounded-lg border border-[var(--color-border)] bg-white/80 px-3.5 py-2.5 text-[15px]"
               >
                 {medicos.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -90,12 +90,12 @@ export default async function AgendaPage({
                 name="fecha"
                 type="date"
                 defaultValue={fecha}
-                className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm"
+                className="rounded-lg border border-[var(--color-border)] bg-white/80 px-3.5 py-2.5 text-[15px]"
               />
             </div>
             <button
               type="submit"
-              className="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm font-medium hover:border-[var(--color-brand-azul-funcional)]"
+              className="rounded-lg border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-semibold backdrop-blur hover:border-[var(--color-brand-azul-funcional)]"
             >
               Ver
             </button>
@@ -114,8 +114,8 @@ export default async function AgendaPage({
               const activa = c.estado !== "CANCELADA" && c.estado !== "COMPLETADA";
 
               return (
-                <div key={c.id} className="border-b border-[var(--color-border-soft)] px-5 py-4 last:border-b-0">
-                  <div className="flex items-center justify-between text-sm">
+                <div key={c.id} className="border-b border-white/60 px-6 py-5 last:border-b-0">
+                  <div className="flex items-center justify-between text-[15px]">
                     <div>
                       <span className="font-semibold text-[var(--color-foreground)]">
                         {FORMATO_HORA.format(c.fechaHoraInicio)}
@@ -128,7 +128,7 @@ export default async function AgendaPage({
                   </div>
 
                   {activa && (
-                    <div className="mt-2.5 flex items-center gap-4">
+                    <div className="mt-3 flex items-center gap-5">
                       {c.estado === "AGENDADA" && (
                         <form action={confirmarConId}>
                           <button type="submit" className={linkAction} style={{ color: "var(--color-success)" }}>

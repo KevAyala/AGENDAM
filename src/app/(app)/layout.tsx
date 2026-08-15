@@ -16,9 +16,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const { authUser, usuario } = await obtenerUsuarioActual();
 
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-[var(--color-background)]">
+    <div className="app-shell-bg flex min-h-full flex-1 flex-col">
       <nav
-        className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 px-6 py-4"
+        className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 px-8 py-5"
         style={{
           background: "rgba(11,24,41,0.92)",
           backdropFilter: "blur(20px)",
@@ -26,9 +26,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           borderBottom: "1px solid rgba(178,213,229,0.12)",
         }}
       >
-        <div className="flex items-center gap-8">
-          <SmallLogotype />
-          <div className="flex items-center gap-5">
+        <div className="flex items-center gap-10">
+          <SmallLogotype markSize={30} fontSize={14} />
+          <div className="flex items-center gap-6">
             {ENLACES.map((enlace) => (
               <Link
                 key={enlace.href}
@@ -40,7 +40,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           <span className="kicker text-white/35">
             {usuario ? `${usuario.nombre} · ${usuario.rol}` : authUser.email}
           </span>
@@ -53,13 +53,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </nav>
 
       {!usuario && (
-        <div className="bg-[var(--color-brand-rosa-claro)] px-6 py-2 text-center text-xs text-[#7a3049]">
+        <div className="bg-[var(--color-brand-rosa-claro)] px-6 py-2.5 text-center text-sm text-[#7a3049]">
           Tu cuenta existe en Supabase Auth pero no tiene fila en <code>usuarios</code> — pide
           a un Administrador que te dé de alta (rol) antes de usar el resto de la app.
         </div>
       )}
 
-      <main className="flex-1 px-6 py-10">{children}</main>
+      <main className="flex-1 px-8 py-14">{children}</main>
     </div>
   );
 }

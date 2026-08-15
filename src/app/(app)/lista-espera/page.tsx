@@ -13,7 +13,7 @@ export default async function ListaEsperaPage() {
   });
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6">
+    <div className="mx-auto flex max-w-2xl flex-col gap-8">
       <PageHeader
         kicker="Turnos"
         title="Lista de espera"

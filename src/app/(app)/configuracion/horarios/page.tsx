@@ -33,7 +33,7 @@ export default async function HorariosPage({
   const guardarConId = medicoId ? guardarHorario.bind(null, medicoId) : undefined;
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6">
+    <div className="mx-auto flex max-w-2xl flex-col gap-8">
       <PageHeader
         kicker="RF-029b"
         title="Horario laboral por médico"
@@ -53,7 +53,7 @@ export default async function HorariosPage({
                 id="medicoId"
                 name="medicoId"
                 defaultValue={medicoId}
-                className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm"
+                className="rounded-lg border border-[var(--color-border)] bg-white/80 px-3.5 py-2.5 text-[15px]"
               >
                 {medicos.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -64,7 +64,7 @@ export default async function HorariosPage({
             </div>
             <button
               type="submit"
-              className="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm font-medium hover:border-[var(--color-brand-azul-funcional)]"
+              className="rounded-lg border border-[var(--color-border)] bg-white/70 px-5 py-2.5 text-sm font-semibold backdrop-blur hover:border-[var(--color-brand-azul-funcional)]"
             >
               Ver
             </button>

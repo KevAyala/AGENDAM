@@ -32,8 +32,8 @@
   --success: #2F7A4F;
   --danger: #D4183D;
 
-  --radius-card: 1rem;
-  --shadow-card: 0 1px 2px rgba(11, 24, 41, 0.04), 0 10px 28px -14px rgba(11, 24, 41, 0.18);
+  --radius-card: 1.25rem;
+  --shadow-card: 0 1px 2px rgba(11, 24, 41, 0.04), 0 16px 36px -16px rgba(11, 24, 41, 0.22);
 }
 
 @theme inline {
@@ -74,5 +74,17 @@ body {
   font-family: var(--font-dm-mono), monospace;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
+}
+
+/* Fondo con textura de marca para las pantallas de trabajo — glows suaves
+   de la paleta sobre el blanco cálido. Sin esto, `backdrop-blur` en las
+   tarjetas no tiene nada que desenfocar y el glassmorphism no se nota. */
+.app-shell-bg {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse 60% 50% at 8% 0%, rgba(178, 213, 229, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 100% 15%, rgba(251, 234, 240, 0.55) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(178, 213, 229, 0.2) 0%, transparent 60%);
+  background-attachment: fixed;
 }
