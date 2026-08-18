@@ -12,6 +12,7 @@ Versión 0.2 | Estado: Borrador | Agosto 2026
 | 0.2 | Estrategia multi-tenant actualizada a **base de datos separada por consultorio** (en vez de fila compartida con `organizacion_id`), aprovisionada manualmente. Se agrega estrategia de auditoría/trazabilidad y principio de diseño explícito: el aprovisionamiento manual se hace mediante scripts y una tabla de mapeo reales desde el MVP, para que una futura automatización no requiera rediseño. |
 | 0.3 | Se cierra el levantamiento (Documento 02). Se agrega advertencia técnica sobre coexistencia de WhatsApp Business, importación CSV de catálogo de medicamentos, y nota de UX sobre selección rápida de médico ante crecimiento a más de uno. |
 | 0.4 | Se agrega el componente de **IA para clasificación de intención en WhatsApp** (modelo híbrido IA + humano) al stack y al roadmap de la Fase 3. |
+| 0.5 | Al implementar la Fase 3 se acuerdan dos desviaciones temporales respecto a RF-041/RF-045 (Documento 04), documentadas en detalle en `src/lib/whatsapp.ts`: (1) se usa el **WhatsApp Sandbox de Twilio** en vez del número real de la farmacia, para no arriesgarlo mientras se prueba el flujo; (2) se difiere el **clasificador de intención por IA** — el paciente responde un menú cerrado (1/2/3 = confirmar/reagendar/cancelar) en vez de lenguaje libre. Migrar a número real y/o agregar el clasificador de IA no requiere rediseño: el modelo de datos (`EstadoConfirmacionWsp`, `MensajeWhatsapp`) ya está listo para ambos. |
 
 ## 1. Contexto de esta decisión
 

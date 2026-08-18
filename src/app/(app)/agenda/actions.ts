@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { registrarBitacora } from "@/lib/audit";
 import { obtenerUsuarioActual } from "@/lib/current-user";
 import { guardarUltimoMedicoId } from "@/lib/ultimo-medico";
+import { enviarConfirmacionParaCita } from "@/lib/whatsapp";
 
 // RF-035e: recuerda el médico elegido para la próxima vez que se abra la
 // Agenda o Turnos.
@@ -138,5 +139,19 @@ export async function confirmarCita(citaId: string) {
     await registrarBitacora({ usuarioId: usuario.id, accion: "cita_confirmada", entidadAfectada: citaId });
   }
 
+  revalidatePath("/agenda");
+}
+
+/**
+ * Fase 3 — envío manual del mensaje de confirmación por WhatsApp (RF-040),
+ * para no depender solo del cron programado al probar o al querer
+ * reenviarlo a mano. Reutiliza la misma lógica que el cron.
+ */
+export async function enviarConfirmacionWhatsapp(citaId: string) {
+  try {
+    await enviarConfirmacionParaCita(citaId);
+  } catch (err) {
+    console.error(`[whatsapp] error en envío manual para cita ${citaId}:`, err);
+  }
   revalidatePath("/agenda");
 }

@@ -70,10 +70,16 @@ model Usuario {
 // RF-080/081 (Documento 04 §3.9) + diccionario de datos §6.8.
 // Retención mínima de 5 años (RNF-03a) — se administra a nivel de política
 // de base de datos / backups, no de borrado aplicativo.
+//
+// `usuarioId` es opcional desde Fase 3: RF-041d pide registrar en bitácora
+// las transiciones automáticas del módulo de WhatsApp (mensaje enviado por
+// el cron, respuesta procesada por el webhook de Twilio) — esas acciones no
+// tienen un Usuario autenticado detrás, las dispara el sistema o el propio
+// paciente por WhatsApp.
 model BitacoraAuditoria {
   id              String   @id @default(cuid())
-  usuarioId       String
-  usuario         Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId       String?
+  usuario         Usuario? @relation(fields: [usuarioId], references: [id])
   accion          String
   entidadAfectada String?
   fechaHora       DateTime @default(now())
@@ -146,6 +152,21 @@ enum EstadoCita {
   NO_ASISTIO
 }
 
+// Fase 3 — RF-040/040a/041a: estado del intercambio de confirmación por
+// WhatsApp para esta cita. La versión IA del clasificador (RF-041) se
+// difiere: por ahora la respuesta se interpreta con un menú cerrado
+// (1/2/3 o confirmar/reagendar/cancelar) en vez de lenguaje libre — ver
+// nota de alcance en Documento 03 (Fase 3, revisión del roadmap). Cuando
+// se agregue el clasificador de IA, este mismo campo sigue sirviendo.
+enum EstadoConfirmacionWsp {
+  PENDIENTE // todavía no toca enviar (RF-040a: se envía en su ventana)
+  ENVIADA
+  CONFIRMADA
+  CANCELADA
+  REAGENDAR_SOLICITADO // RF-041b: se escala a recepción (sin IA que pausar)
+  NO_ENTENDIDO
+}
+
 // RF-029a: la agenda se consulta de forma nativa en AGENDAM. RF-028: crear,
 // reprogramar, cancelar citas; estados de cita.
 model Cita {
@@ -165,11 +186,39 @@ model Cita {
   creadoEn        DateTime     @default(now())
   actualizadoEn   DateTime     @updatedAt
 
-  turno Turno?
+  estadoConfirmacionWsp EstadoConfirmacionWsp @default(PENDIENTE)
+  confirmacionEnviadaEn DateTime?
+
+  turno    Turno?
+  mensajes MensajeWhatsapp[]
 
   @@index([medicoId, fechaHoraInicio])
   @@index([pacienteId])
   @@map("citas")
+}
+
+enum DireccionMensajeWsp {
+  SALIENTE
+  ENTRANTE
+}
+
+// Fase 3 — bitácora específica de la conversación de WhatsApp por cita
+// (distinta de BitacoraAuditoria, que es transversal a toda la app). Sirve
+// para depurar entregas de Twilio y como respaldo textual de qué exactamente
+// contestó el paciente. Simplifica la entidad `ConversacionWhatsApp` del
+// diccionario de datos (§6.7b) porque, sin el clasificador de IA, no hay un
+// estado ia_activa/pendiente_humano que controlar — cada fila es un mensaje.
+model MensajeWhatsapp {
+  id         String              @id @default(cuid())
+  citaId     String
+  cita       Cita                @relation(fields: [citaId], references: [id])
+  direccion  DireccionMensajeWsp
+  cuerpo     String
+  twilioSid  String?
+  creadoEn   DateTime            @default(now())
+
+  @@index([citaId])
+  @@map("mensajes_whatsapp")
 }
 
 enum TipoTurno {

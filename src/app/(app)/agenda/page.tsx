@@ -2,7 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { obtenerUltimoMedicoId } from "@/lib/ultimo-medico";
 import { PageHeader, Badge, card, btnPrimary, linkAction, linkDanger, type Tono } from "@/components/ui";
-import { cancelarCita, confirmarCita, filtrarAgenda, reprogramarCita } from "./actions";
+import { cancelarCita, confirmarCita, enviarConfirmacionWhatsapp, filtrarAgenda, reprogramarCita } from "./actions";
 
 const FORMATO_HORA = new Intl.DateTimeFormat("es-MX", { timeStyle: "short" });
 
@@ -17,6 +17,23 @@ const TONO_ESTADO: Record<string, Tono> = {
   CANCELADA: "strike",
   COMPLETADA: "neutral",
   NO_ASISTIO: "danger",
+};
+
+// Fase 3 — estado del intercambio de confirmación por WhatsApp (RF-040).
+const TONO_WSP: Record<string, Tono> = {
+  ENVIADA: "info",
+  CONFIRMADA: "success",
+  CANCELADA: "danger",
+  REAGENDAR_SOLICITADO: "warning",
+  NO_ENTENDIDO: "warning",
+};
+
+const ETIQUETA_WSP: Record<string, string> = {
+  ENVIADA: "WhatsApp enviado",
+  CONFIRMADA: "Confirmó por WhatsApp",
+  CANCELADA: "Canceló por WhatsApp",
+  REAGENDAR_SOLICITADO: "Pidió reagendar por WhatsApp",
+  NO_ENTENDIDO: "Respuesta no clara por WhatsApp",
 };
 
 export default async function AgendaPage({
@@ -111,6 +128,7 @@ export default async function AgendaPage({
               const reprogramarConId = reprogramarCita.bind(null, c.id);
               const cancelarConId = cancelarCita.bind(null, c.id);
               const confirmarConId = confirmarCita.bind(null, c.id);
+              const enviarWspConId = enviarConfirmacionWhatsapp.bind(null, c.id);
               const activa = c.estado !== "CANCELADA" && c.estado !== "COMPLETADA";
 
               return (
@@ -124,7 +142,12 @@ export default async function AgendaPage({
                         · {c.paciente.apellidos}, {c.paciente.nombre} · {c.tipoConsulta.nombre}
                       </span>
                     </div>
-                    <Badge tone={TONO_ESTADO[c.estado]}>{c.estado}</Badge>
+                    <div className="flex items-center gap-2">
+                      {c.estadoConfirmacionWsp !== "PENDIENTE" && (
+                        <Badge tone={TONO_WSP[c.estadoConfirmacionWsp]}>{ETIQUETA_WSP[c.estadoConfirmacionWsp]}</Badge>
+                      )}
+                      <Badge tone={TONO_ESTADO[c.estado]}>{c.estado}</Badge>
+                    </div>
                   </div>
 
                   {activa && (
@@ -136,6 +159,11 @@ export default async function AgendaPage({
                           </button>
                         </form>
                       )}
+                      <form action={enviarWspConId}>
+                        <button type="submit" className={linkAction}>
+                          {c.estadoConfirmacionWsp === "PENDIENTE" ? "Enviar WhatsApp" : "Reenviar WhatsApp"}
+                        </button>
+                      </form>
                       <details className="text-xs">
                         <summary className="cursor-pointer text-[var(--color-brand-azul-funcional)]">
                           Reprogramar

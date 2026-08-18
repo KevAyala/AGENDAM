@@ -10,7 +10,10 @@ import { prisma } from "@/lib/prisma";
  * directamente.
  */
 export async function registrarBitacora(params: {
-  usuarioId: string;
+  // Opcional desde Fase 3: acciones automáticas del módulo de WhatsApp
+  // (cron de envío, webhook de respuesta) no tienen un Usuario autenticado
+  // detrás — ver nota en el modelo BitacoraAuditoria (RF-041d).
+  usuarioId?: string;
   accion: string;
   entidadAfectada?: string;
 }) {
