@@ -83,8 +83,9 @@ body {
 .app-shell-bg {
   background-color: var(--background);
   background-image:
-    radial-gradient(ellipse 60% 50% at 8% 0%, rgba(178, 213, 229, 0.35) 0%, transparent 60%),
-    radial-gradient(ellipse 55% 45% at 100% 15%, rgba(251, 234, 240, 0.55) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(178, 213, 229, 0.2) 0%, transparent 60%);
+    radial-gradient(ellipse 65% 55% at 6% -8%, rgba(178, 213, 229, 0.6) 0%, transparent 62%),
+    radial-gradient(ellipse 60% 50% at 108% 8%, rgba(212, 83, 126, 0.3) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 50% at 95% 95%, rgba(251, 234, 240, 0.75) 0%, transparent 62%),
+    radial-gradient(ellipse 55% 45% at 0% 100%, rgba(178, 213, 229, 0.45) 0%, transparent 60%);
   background-attachment: fixed;
 }

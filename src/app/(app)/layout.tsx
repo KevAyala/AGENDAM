@@ -18,22 +18,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="app-shell-bg flex min-h-full flex-1 flex-col">
       <nav
-        className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 px-8 py-5"
-        style={{
-          background: "rgba(11,24,41,0.92)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(178,213,229,0.12)",
-        }}
+        className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 border-b border-white/70 bg-white/70 px-8 py-5 shadow-[var(--shadow-card)] backdrop-blur-xl"
       >
         <div className="flex items-center gap-10">
-          <SmallLogotype markSize={30} fontSize={14} />
+          <SmallLogotype markSize={30} fontSize={14} textColor="#2F6F94" />
           <div className="flex items-center gap-6">
             {ENLACES.map((enlace) => (
               <Link
                 key={enlace.href}
                 href={enlace.href}
-                className="kicker text-white/55 transition-colors hover:text-white"
+                className="kicker text-[var(--color-foreground-muted)] transition-colors hover:text-[var(--color-brand-azul-funcional)]"
               >
                 {enlace.label}
               </Link>
@@ -41,11 +35,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </div>
         <div className="flex items-center gap-5">
-          <span className="kicker text-white/35">
+          <span className="kicker text-[var(--color-foreground-faint)]">
             {usuario ? `${usuario.nombre} · ${usuario.rol}` : authUser.email}
           </span>
           <form action={cerrarSesion}>
-            <button type="submit" className="kicker text-white/50 transition-colors hover:text-white/85">
+            <button
+              type="submit"
+              className="kicker text-[var(--color-foreground-muted)] transition-colors hover:text-[var(--color-brand-azul-funcional)]"
+            >
               Cerrar sesión
             </button>
           </form>

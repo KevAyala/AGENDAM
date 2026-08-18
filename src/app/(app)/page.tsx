@@ -3,11 +3,11 @@ import { obtenerUsuarioActual } from "@/lib/current-user";
 import { PageHeader, card } from "@/components/ui";
 
 const ACCESOS = [
-  { href: "/pacientes", titulo: "Pacientes", desc: "Registrar y buscar pacientes.", num: "01" },
-  { href: "/agenda", titulo: "Agenda", desc: "Ver y crear citas por médico.", num: "02" },
-  { href: "/turnos", titulo: "Turnos", desc: "Cola de espera del día, por médico.", num: "03" },
-  { href: "/lista-espera", titulo: "Lista de espera", desc: "Consultas cortas pendientes de hueco.", num: "04" },
-  { href: "/configuracion/horarios", titulo: "Horarios", desc: "Horario laboral de cada médico.", num: "05" },
+  { href: "/pacientes", titulo: "Pacientes", desc: "Registrar y buscar pacientes." },
+  { href: "/agenda", titulo: "Agenda", desc: "Ver y crear citas por médico." },
+  { href: "/turnos", titulo: "Turnos", desc: "Cola de espera del día, por médico." },
+  { href: "/lista-espera", titulo: "Lista de espera", desc: "Consultas cortas pendientes de hueco." },
+  { href: "/configuracion/horarios", titulo: "Horarios", desc: "Horario laboral de cada médico." },
 ];
 
 export default async function Home() {
@@ -30,22 +30,22 @@ export default async function Home() {
         }
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {ACCESOS.map((a) => (
           <Link
             key={a.href}
             href={a.href}
-            className={`group flex flex-col gap-3 p-5 transition-all hover:-translate-y-0.5 hover:border-[var(--color-brand-azul-funcional)]/40 ${card}`}
+            className={`group relative flex flex-col gap-2 overflow-hidden p-7 transition-all hover:-translate-y-1 hover:border-[var(--color-brand-azul-funcional)]/40 hover:shadow-[0_20px_44px_-18px_rgba(212,83,126,0.35)] ${card}`}
           >
-            <span className="kicker text-[var(--color-brand-azul-principal)]" style={{ opacity: 0.9 }}>
-              {a.num}
-            </span>
-            <div>
-              <div className="text-sm font-bold text-[var(--color-foreground)] group-hover:text-[var(--color-brand-azul-funcional)]">
-                {a.titulo}
-              </div>
-              <p className="mt-1 text-xs text-[var(--color-foreground-muted)]">{a.desc}</p>
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full"
+              style={{ background: "radial-gradient(circle, rgba(212,83,126,0.22) 0%, transparent 70%)" }}
+            />
+            <div className="relative text-lg font-bold text-[var(--color-foreground)] group-hover:text-[var(--color-brand-azul-funcional)]">
+              {a.titulo}
             </div>
+            <p className="relative text-[15px] text-[var(--color-foreground-muted)]">{a.desc}</p>
           </Link>
         ))}
       </div>
