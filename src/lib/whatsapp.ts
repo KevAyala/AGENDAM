@@ -33,11 +33,20 @@ function clienteTwilio() {
   return twilio(sid, token);
 }
 
-/** Normaliza un teléfono capturado en México (10 dígitos locales) a E.164. */
+/**
+ * Normaliza un teléfono capturado en México (10 dígitos locales) a E.164
+ * para WhatsApp. Nota importante: WhatsApp exige el "1" extra después del
+ * 52 para celulares mexicanos (+521XXXXXXXXXX) — una regla histórica de
+ * numeración que ya no aplica para marcar normalmente, pero que Twilio/
+ * WhatsApp todavía requiere en sus mensajes. Sin el "1", Twilio acepta el
+ * envío sin error pero el mensaje nunca llega al teléfono.
+ */
 export function normalizarTelefonoMx(telefono: string): string {
-  const digitos = telefono.replace(/\D/g, "");
-  if (digitos.startsWith("52")) return `+${digitos}`;
-  return `+52${digitos}`;
+  let digitos = telefono.replace(/\D/g, "");
+  if (digitos.startsWith("521")) return `+${digitos}`;
+  if (digitos.startsWith("52")) digitos = `521${digitos.slice(2)}`;
+  else digitos = `521${digitos}`;
+  return `+${digitos}`;
 }
 
 const FORMATO_FECHA = new Intl.DateTimeFormat("es-MX", { dateStyle: "full" });
